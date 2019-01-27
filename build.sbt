@@ -46,6 +46,7 @@ lazy val commonSettings =
         releaseStepCommandAndRemaining("+clean"),
         releaseStepCommandAndRemaining("+test"),
         setReleaseVersion,
+        releaseStepTask(updateVersionInReadme),
         commitReleaseVersion,
         tagRelease,
         releaseStepCommandAndRemaining("+publishSigned"),
@@ -125,3 +126,11 @@ lazy val ossPublishSettings = Seq(
   releaseIgnoreUntrackedFiles := true,
   releaseProcess := Release.steps(organization.value)
 )
+
+lazy val updateVersionInReadme =
+  taskKey[Unit]("Updates version in README.md to the one present in version.sbt")
+
+updateVersionInReadme := {
+  Versions.replaceVersionInReadmeForSbt(version.value)
+  Versions.replaceVersionInReadmeForMaven(version.value)
+}

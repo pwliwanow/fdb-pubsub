@@ -1,5 +1,6 @@
 # FDB-PubSub
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.pwliwanow.fdb-pubsub/pubsub_2.12/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.pwliwanow.fdb-pubsub/pubsub_2.12)
 [![Build Status](https://travis-ci.org/pwliwanow/fdb-pubsub.svg?branch=master)](https://travis-ci.org/pwliwanow/fdb-pubsub)
 [![codecov](https://codecov.io/gh/pwliwanow/fdb-pubsub/branch/master/graph/badge.svg)](https://codecov.io/gh/pwliwanow/fdb-pubsub)
 
@@ -39,6 +40,21 @@ It will be addressed in future releases.
 
 # Quickstart
 FDB-PubSub provides both Java and Scala API provided. Java API is present in package `com.github.pwliwanow.fdb.pubsub.javadsl` and Scala API is present in `com.github.pwliwanow.fdb.pubsub.scaladsl`. Module `example` contains small examples written in Java and in Scala.
+
+### Dependency
+To get started with FDB-PubSub add the following dependency with SBT:
+```scala
+val fdbPubSubVersion = "0.1.0"
+libraryDependencies += "com.github.pwliwanow.fdb-pubsub" %% "pubsub" % fdbPubSubVersion
+```
+or Maven:
+```xml
+<dependency>
+  <groupId>com.github.pwliwanow.fdb-pubsub</groupId>
+  <artifactId>pubsub_2.12</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
 
 ### PubSubClient
 To start you need to create a `PubSubClient`, it's an immutable class that can be freely shared within the application. It allows user to create a topic, get producer and create a consumer. `PubSubClient` requires a `Subspace` that it will operate on and a `Database` to be provided:
