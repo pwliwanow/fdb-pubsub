@@ -1,4 +1,8 @@
 # FDB-PubSub
+
+[![Build Status](https://travis-ci.org/pwliwanow/fdb-pubsub.svg?branch=master)](https://travis-ci.org/pwliwanow/fdb-pubsub)
+[![codecov](https://codecov.io/gh/pwliwanow/fdb-pubsub/branch/master/graph/badge.svg)](https://codecov.io/gh/pwliwanow/fdb-pubsub)
+
 FDB-PubSub is a publish subscribe layer for [FoundationDB](https://apple.github.io/foundationdb/index.html), built on top of [Akka Streams](https://doc.akka.io/docs/akka/2.5/stream/stream-introduction.html) and it provides Java and Scala API. It is inspired by Kafka.
 
 ### Motivation
