@@ -88,7 +88,7 @@ val futureResult: Future[NotUsed] = pubSubClient.createTopic("testTopic", number
 ```java
 // Java
 int numberOfPartitions = 10;
-CompletableFuture[NotUsed] futureResult = pubSubClient.createTopic("testTopic", numberOfPartitions, ec);
+CompletableFuture<NotUsed> futureResult = pubSubClient.createTopic("testTopic", numberOfPartitions, ec);
 ```
 
 ### Using a producer
@@ -107,7 +107,7 @@ val futureResult: Future[NotUsed] = dbio.transact(database);
 ```java
 // Java
 Producer producer = pubSubClient.producer();
-CompletableFuture[NotUsed] futureResult = 
+CompletableFuture<NotUsed> futureResult = 
   database.runAsync(tx -> 
     producer.send(
       tx, 
@@ -130,7 +130,7 @@ val consumer = pubSubClient.consumer("testTopic", "testConsumerGroup", defaultSe
 // Java
 Materializer mat = ActorMaterializer.create();
 ConsumerSettings defaultSettings = ConsumerSettings.create();
-SubSource[ConsumerRecord[KeyValue], NotUsed] consumer = 
+SubSource[ConsumerRecord<KeyValue>, NotUsed] consumer = 
   pubSubClient.consumer("testTopic", "testConsumerGroup", defaultSettings, mat);
 ```
 
