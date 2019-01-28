@@ -130,7 +130,7 @@ val consumer = pubSubClient.consumer("testTopic", "testConsumerGroup", defaultSe
 // Java
 Materializer mat = ActorMaterializer.create();
 ConsumerSettings defaultSettings = ConsumerSettings.create();
-SubSource[ConsumerRecord<KeyValue>, NotUsed] consumer = 
+SubSource<ConsumerRecord<KeyValue>, NotUsed> consumer = 
   pubSubClient.consumer("testTopic", "testConsumerGroup", defaultSettings, mat);
 ```
 
