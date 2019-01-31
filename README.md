@@ -92,7 +92,7 @@ CompletableFuture<NotUsed> futureResult = pubSubClient.createTopic("testTopic", 
 ```
 
 ### Using a producer
-Producers from Java and Scala API differ in how they compose transactions. Java API takes additional `TransactionContext` as a parameter and returns `CompletableFuture[NotUsed]`, and Scala API returns `DBIO[NotUsed]` (which is a type from [foundationdb4s](https://github.com/pwliwanow/foundationdb4s)).
+Producers from Java and Scala API differ in how they compose transactions. Java API takes additional `TransactionContext` as a parameter and returns `CompletableFuture<NotUsed>`, and Scala API returns `DBIO[NotUsed]` (which is a type from [foundationdb4s](https://github.com/pwliwanow/foundationdb4s)).
 
 ```scala
 // Scala
