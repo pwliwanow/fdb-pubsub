@@ -36,7 +36,7 @@ Concepts and assumptions are similar to Kafka. Here is brief overview of FDB-Pub
 Currently, those locks are being acquired rather aggressively by consumers that joined: consumer that held a lock is not aware about the fact that other consumer wants to join, and newly connected consumer simply acquires some of the locks that were held by others. 
 As the result, when processing data using at least once delivery semantics, it causes messages to be proccessed more times that it would be neccessary if locks were acquired gracefully. 
 It will be addressed in future releases.
-- No tests were performed as of now. Currently - with default settings - having up to 10 consumers and 1000 partitions should be perfectly fine.
+- No performance tests were performed as of now. Currently - with default settings - having up to 10 consumers and 1000 partitions should be perfectly fine.
 
 # Quickstart
 FDB-PubSub provides both Java and Scala API provided. Java API is present in package `com.github.pwliwanow.fdb.pubsub.javadsl` and Scala API is present in `com.github.pwliwanow.fdb.pubsub.scaladsl`. Module `example` contains small examples written in Java and in Scala.
@@ -217,7 +217,7 @@ consumer
 int parallelism = 10;
 consumer
   .via(Consumer.commitableFlow(database))
-  .mapAsync(parallelism)
+  .mapAsync(parallelism, this::sendNotCriticalNotification)
   .to(Sink.ignore)
   .run(mat);
 
