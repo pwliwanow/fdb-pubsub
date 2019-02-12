@@ -316,7 +316,7 @@ class ConsumerSpec extends FdbPubSubSpec {
         partitionNo = partitionNumber)
     def updateVersionstamp(newV: Versionstamp): DBIO[Unit] =
       for {
-        metadata <- typedConsumerGroupMetadataSubspace.get(key): DBIO[Option[ConsumerGroupMetadata]]
+        metadata <- typedConsumerGroupMetadataSubspace.get(key).toDBIO
         _ <- typedConsumerGroupMetadataSubspace.set(metadata.get.copy(updatedWithLock = newV))
       } yield ()
     for {

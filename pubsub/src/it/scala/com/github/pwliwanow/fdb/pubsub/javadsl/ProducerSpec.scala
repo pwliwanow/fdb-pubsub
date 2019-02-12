@@ -20,21 +20,21 @@ class ProducerSpec extends FdbPubSubSpec {
     val (keys, values) = createKeyValues(3).unzip
     database
       .runAsync { tx =>
-          val futureResult = javaProducer.send(
+        val futureResult = javaProducer.send(
+          tx,
+          topic,
+          partitionNumber,
+          Tuple.from(keys(1)).pack,
+          Tuple.from(values(1)).pack,
+          userVersion = 2)
+        futureResult.thenCompose[NotUsed] { _ =>
+          javaProducer.send(
             tx,
             topic,
             partitionNumber,
-            Tuple.from(keys(1)).pack,
-            Tuple.from(values(1)).pack,
-            userVersion = 2)
-          futureResult.thenCompose[NotUsed] { _ =>
-            javaProducer.send(
-              tx,
-              topic,
-              partitionNumber,
-              Tuple.from(keys.head).pack,
-              Tuple.from(values.head).pack)
-          }
+            Tuple.from(keys.head).pack,
+            Tuple.from(values.head).pack)
+        }
       }
       .join()
     database
@@ -88,7 +88,7 @@ class ProducerSpec extends FdbPubSubSpec {
           Tuple.from(keys.head).pack,
           Tuple.from(values.head).pack,
           2)
-      }
+    }
     val exception = intercept[CompletionException](produce().join())
     assert(exception.getCause.isInstanceOf[PartitionNotExistsException])
   }

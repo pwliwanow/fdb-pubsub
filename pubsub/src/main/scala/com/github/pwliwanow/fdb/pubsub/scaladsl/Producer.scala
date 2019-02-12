@@ -58,7 +58,7 @@ private[pubsub] final class FdbProducer(
 
   def send(topic: String, key: Array[Byte], value: Array[Byte], userVersion: Int): DBIO[NotUsed] = {
     for {
-      numberOfPartitions <- getNumberOfPartitions(topic)
+      numberOfPartitions <- getNumberOfPartitions(topic).toDBIO
       partitionNumber = Math.abs(util.Arrays.hashCode(key) % numberOfPartitions)
       _ <- store(topic, partitionNumber, key, value, userVersion)
     } yield NotUsed
@@ -79,7 +79,7 @@ private[pubsub] final class FdbProducer(
       value: Array[Byte],
       userVersion: Int): DBIO[NotUsed] = {
     for {
-      numberOfPartitions <- getNumberOfPartitions(topic)
+      numberOfPartitions <- getNumberOfPartitions(topic).toDBIO
       _ <- if (numberOfPartitions < partitionNumber) {
         DBIO.failed(PartitionNotExistsException(partitionNumber, numberOfPartitions))
       } else {

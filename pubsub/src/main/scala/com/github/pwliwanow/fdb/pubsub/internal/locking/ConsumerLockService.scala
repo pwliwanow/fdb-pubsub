@@ -23,7 +23,7 @@ private[pubsub] class ConsumerLockService(
     def doAcquire(): DBIO[Boolean] =
       lockSubspace.set(ConsumerLock(key, Versionstamp.incomplete(), now, acquiredBy)).map(_ => true)
     val dbio = for {
-      maybeCurrentLock <- lockSubspace.get(key): DBIO[Option[ConsumerLock]]
+      maybeCurrentLock <- lockSubspace.get(key).toDBIO
       acquired <- maybeCurrentLock
         .filter(!isExpired(_))
         .fold(doAcquire())(_ => DBIO.pure(false))
@@ -44,7 +44,7 @@ private[pubsub] class ConsumerLockService(
         .set(ConsumerLock(existingLock.key, Versionstamp.incomplete(), now, forceAcquireBy))
         .map(_ => true)
     val dbio = for {
-      maybeCurrentLock <- lockSubspace.get(existingLock.key): DBIO[Option[ConsumerLock]]
+      maybeCurrentLock <- lockSubspace.get(existingLock.key).toDBIO
       acquired <- maybeCurrentLock
         .filter(_.acquiredWith == existingLock.acquiredWith)
         .fold(DBIO.pure(false))(_ => doAcquire())
@@ -65,7 +65,7 @@ private[pubsub] class ConsumerLockService(
     val now = clock.instant
     def doRefresh(): DBIO[Unit] = lockSubspace.set(ConsumerLock(key, acquiredWith, now, acquiredBy))
     val dbio: DBIO[Boolean] = for {
-      maybeLock <- lockSubspace.get(key): DBIO[Option[ConsumerLock]]
+      maybeLock <- lockSubspace.get(key).toDBIO
       shouldBeRefreshed = maybeLock.fold(false)(_.acquiredWith == acquiredWith)
       _ <- if (shouldBeRefreshed) doRefresh() else DBIO.pure(Unit)
     } yield shouldBeRefreshed
@@ -95,7 +95,7 @@ private[pubsub] class ConsumerLockService(
 
   private def releaseLock(lock: ConsumerLock): DBIO[Unit] = {
     for {
-      maybeCurrentLock <- lockSubspace.get(lock.key): DBIO[Option[ConsumerLock]]
+      maybeCurrentLock <- lockSubspace.get(lock.key).toDBIO
       shouldBeReleased = maybeCurrentLock.fold(false)(_.acquiredWith == lock.acquiredWith)
       _ <- if (shouldBeReleased) lockSubspace.clear(lock.key) else DBIO.pure(Unit)
     } yield ()
