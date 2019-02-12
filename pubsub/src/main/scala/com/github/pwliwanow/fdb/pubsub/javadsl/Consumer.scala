@@ -8,7 +8,6 @@ import com.github.pwliwanow.fdb.pubsub.ConsumerRecord
 import com.github.pwliwanow.fdb.pubsub.scaladsl.{Consumer => ScalaConsumer}
 import com.github.pwliwanow.foundationdb4s.core.DBIO
 
-import scala.compat.java8.FutureConverters._
 import scala.concurrent.ExecutionContextExecutor
 
 object Consumer {
@@ -42,7 +41,7 @@ object Consumer {
   private def toDBIO[A, B](
       r: ConsumerRecord[A],
       f: (TransactionContext, ConsumerRecord[A]) => CompletableFuture[B]): DBIO[B] = {
-    DBIO((tx: TransactionContext, _: ExecutionContextExecutor) => f(tx, r).toScala)
+    DBIO.fromTransactionToPromise(f(_, r))
   }
 
 }

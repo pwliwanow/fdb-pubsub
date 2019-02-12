@@ -16,7 +16,7 @@ private[pubsub] class TopicMetadataService(subspace: TopicMetadataSubspace) {
   def createTopic(topic: String, numberOfPartitions: Int): DBIO[NotUsed] = {
     val metadata = TopicMetadata(topic, numberOfPartitions, Instant.now, Versionstamp.incomplete())
     for {
-      maybeExistingMetadata <- subspace.get(topic): DBIO[Option[TopicMetadata]]
+      maybeExistingMetadata <- subspace.get(topic).toDBIO
       _ <- maybeExistingMetadata.fold(subspace.set(metadata)) { alreadyExisting =>
         if (alreadyExisting.numberOfPartitions == numberOfPartitions) DBIO.pure(())
         else

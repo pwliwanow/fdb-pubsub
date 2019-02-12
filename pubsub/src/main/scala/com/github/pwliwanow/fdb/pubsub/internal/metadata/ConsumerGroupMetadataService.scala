@@ -27,7 +27,7 @@ private[pubsub] class ConsumerGroupMetadataService(subspace: ConsumerGroupMetada
             updatedWithLock = lock.acquiredWith))
         .map(_ => UpdateLockResult.Success)
     for {
-      maybeExisting <- subspace.get(key)
+      maybeExisting <- subspace.get(key).toDBIO
       result <- maybeExisting.fold(doUpdate()) { x =>
         if (x.updatedWithLock > lock.acquiredWith) {
           DBIO.pure(UpdateLockResult.OutdatedLock)

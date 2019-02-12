@@ -3,11 +3,11 @@ import sbt._
 object Dependencies {
   private val testScopes = List(IntegrationTest, Test)
 
-  private val akkaVersion = "2.5.19"
+  private val akkaVersion = "2.5.20"
   private lazy val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
   private lazy val akkaStreamsTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
 
-  private val fdb4sVersion = "0.6.0"
+  private val fdb4sVersion = "0.7.0"
   private lazy val fdb4sCore = "com.github.pwliwanow.foundationdb4s" %% "foundationdb4s-core" % fdb4sVersion
   private lazy val fdb4sAkkaStreams = "com.github.pwliwanow.foundationdb4s" %% "foundationdb4s-akka-streams" % fdb4sVersion
 

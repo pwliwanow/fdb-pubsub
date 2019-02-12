@@ -9,9 +9,16 @@ import akka.testkit.TestKit
 import com.apple.foundationdb.{Database, FDB, KeyValue}
 import com.apple.foundationdb.subspace.Subspace
 import com.apple.foundationdb.tuple.Tuple
-import com.github.pwliwanow.fdb.pubsub.internal.common.{TopicMetadataSubspace, TopicRecord, TopicSubspace}
+import com.github.pwliwanow.fdb.pubsub.internal.common.{
+  TopicMetadataSubspace,
+  TopicRecord,
+  TopicSubspace
+}
 import com.github.pwliwanow.fdb.pubsub.internal.locking.ConsumersLockSubspace
-import com.github.pwliwanow.fdb.pubsub.internal.metadata.{ConsumerGroupMetadataSubspace, TopicMetadataService}
+import com.github.pwliwanow.fdb.pubsub.internal.metadata.{
+  ConsumerGroupMetadataSubspace,
+  TopicMetadataService
+}
 import com.github.pwliwanow.fdb.pubsub.scaladsl.PubSubClient
 import org.scalatest.{BeforeAndAfterEach, FlatSpecLike}
 

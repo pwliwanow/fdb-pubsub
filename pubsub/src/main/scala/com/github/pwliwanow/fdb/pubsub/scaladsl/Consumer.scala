@@ -20,7 +20,7 @@ object Consumer {
     Flow[ConsumerRecord[A]]
       .mapAsync(1) { record =>
         record.commit
-          .flatMap { result =>
+          .flatMap[Option[B]] { result =>
             if (result) f(record).map(Some(_))
             else DBIO.pure(None)
           }
