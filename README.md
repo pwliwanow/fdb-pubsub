@@ -11,7 +11,7 @@ Getting data from the database to publish subscribe system is [surprisingly hard
 It would be much simpler if developer could publish the event within the business transaction - and it's exactly what FDB-PubSub does, it supports publishing events within FoundationDB transaction.
 
 ### Features:
-- Support for publishing events within FoundationDB transaction
+- Support for publishing events and committing offsets within FoundationDB transaction
 - Easily scalable and fault tolerant storage (thanks to FoundationDB)
 - Easy integration with Apache Cassandra, Apache Kafka, Elasticsearch and more (thanks to [Akka Streams](https://doc.akka.io/docs/akka/2.5/stream/stream-introduction.html) and [Alpakka](https://doc.akka.io/docs/alpakka/current/))
 - Exposed as a library, so if you already opearate FoundationDB there is no new stateful component to maintain
