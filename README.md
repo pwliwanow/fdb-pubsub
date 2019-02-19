@@ -39,7 +39,7 @@ It will be addressed in future releases.
 - No performance tests were performed as of now. Currently - with default settings - having up to 10 consumers and 1000 partitions should be perfectly fine.
 
 # Quickstart
-FDB-PubSub provides both Java and Scala API provided. Java API is present in package `com.github.pwliwanow.fdb.pubsub.javadsl` and Scala API is present in `com.github.pwliwanow.fdb.pubsub.scaladsl`. Module `example` contains small examples written in Java and in Scala.
+FDB-PubSub provides both Java and Scala API. Java API is present in package `com.github.pwliwanow.fdb.pubsub.javadsl` and Scala API is present in `com.github.pwliwanow.fdb.pubsub.scaladsl`. Module `example` contains small examples written in Java and in Scala.
 
 ### Dependency
 To get started with FDB-PubSub add the following dependency with SBT:
