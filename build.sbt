@@ -4,10 +4,19 @@ import sbtrelease.ReleasePlugin.autoImport._
 
 addCommandAlias("testAll", ";test;it:test")
 
+lazy val scala2_12 = "2.12.8"
+lazy val scala2_13 = "2.13.0-M5"
+lazy val supportedScalaVersions = List(scala2_12, scala2_13)
+
+ThisBuild / scalaVersion := scala2_12
+
 lazy val fdbPubSub = project
   .in(file("."))
-  .settings(commonSettings: _*)
-  .settings(skip in publish := true)
+  .settings(
+    commonSettings,
+    skip in publish := true,
+    crossScalaVersions := Nil
+  )
   .aggregate(pubSub, example)
 
 lazy val pubSub = project
@@ -16,7 +25,8 @@ lazy val pubSub = project
   .settings(
     commonSettings,
     name := "pubsub",
-    libraryDependencies ++= allDeps
+    libraryDependencies ++= allDeps,
+    crossScalaVersions := supportedScalaVersions
   )
 
 lazy val example = project
@@ -25,68 +35,53 @@ lazy val example = project
   .settings(
     commonSettings,
     name := "example",
-    skip in publish := true
+    skip in publish := true,
+    coverageEnabled := false,
+    crossScalaVersions := supportedScalaVersions
   )
 
 lazy val commonSettings =
-  buildSettings ++
+  ossPublishSettings ++
     Defaults.itSettings ++
     Seq(
       organization := "com.github.pwliwanow.fdb-pubsub",
-      scalaVersion := "2.12.8",
       scalafmtOnCompile := true,
-      coverageExcludedPackages := "com.github.pwliwanow.fdb.pubsub.example.*",
-      parallelExecution in ThisBuild := false,
-      releaseProcess := Seq(
-        checkSnapshotDependencies,
-        inquireVersions,
-        // publishing locally so that the pgp password prompt is displayed early
-        // in the process
-        releaseStepCommandAndRemaining("+publishLocalSigned"),
-        releaseStepCommandAndRemaining("+clean"),
-        releaseStepCommandAndRemaining("+test"),
-        setReleaseVersion,
-        releaseStepTask(updateVersionInReadme),
-        commitReleaseVersion,
-        tagRelease,
-        releaseStepCommandAndRemaining("+publishSigned"),
-        setNextVersion,
-        commitNextVersion,
-        releaseStepCommand("sonatypeRelease"),
-        pushChanges
-      ),
+      autoCompilerPlugins := true,
+      addCompilerPlugin("com.lihaoyi" %% "acyclic" % acyclicVersion),
       parallelExecution in ThisBuild := false,
       fork := true,
-      scalacOptions ++= Seq(
-        "-unchecked",
-        "-deprecation",
-        "-encoding",
-        "UTF-8",
-        "-explaintypes",
-        "-feature",
-        "-language:higherKinds",
-        "-language:implicitConversions",
-        "-Xfatal-warnings",
-        "-Xlint:inaccessible",
-        "-Xlint:infer-any",
-        "-Ywarn-dead-code",
-        "-Ypartial-unification",
-        "-Ywarn-unused:implicits",
-        "-Ywarn-unused:imports",
-        "-Ywarn-unused:locals",
-        "-Ywarn-unused:params",
-        "-Ywarn-unused:patvars",
-        "-Ywarn-unused:privates"
-      ),
+      scalacOptions ++= {
+        val commonScalacOptions =
+          List(
+            "-unchecked",
+            "-deprecation",
+            "-encoding",
+            "UTF-8",
+            "-explaintypes",
+            "-feature",
+            "-language:higherKinds",
+            "-language:implicitConversions",
+            "-Xfatal-warnings",
+            "-Xlint:inaccessible",
+            "-Xlint:infer-any",
+            "-Ywarn-dead-code",
+            "-Ywarn-unused:implicits",
+            "-Ywarn-unused:imports",
+            "-Ywarn-unused:locals",
+            "-Ywarn-unused:params",
+            "-Ywarn-unused:patvars",
+            "-Ywarn-unused:privates",
+            "-P:acyclic:force"
+          )
+        val extraOptions =
+          if (scalaVersion.value == scala2_12) List("-Ypartial-unification")
+          else List.empty
+        commonScalacOptions ++ extraOptions
+      },
       scalacOptions in (Compile, doc) ++= Seq(
         "-no-link-warnings"
       )
     )
-
-lazy val buildSettings =
-  commonSmlBuildSettings ++
-    acyclicSettings ++
-    ossPublishSettings
 
 lazy val ossPublishSettings = Seq(
   publishTo := Some(
@@ -124,7 +119,25 @@ lazy val ossPublishSettings = Seq(
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   releaseIgnoreUntrackedFiles := true,
-  releaseProcess := Release.steps(organization.value)
+  releaseProcess := Seq(
+    checkSnapshotDependencies,
+    inquireVersions,
+    // publishing locally so that the pgp password prompt is displayed early
+    // in the process
+    releaseStepCommandAndRemaining("+publishLocalSigned"),
+    releaseStepCommandAndRemaining("+clean"),
+    releaseStepCommandAndRemaining("+test"),
+    releaseStepCommandAndRemaining("+it:test"),
+    setReleaseVersion,
+    releaseStepTask(updateVersionInReadme),
+    commitReleaseVersion,
+    tagRelease,
+    releaseStepCommandAndRemaining("+publishSigned"),
+    setNextVersion,
+    commitNextVersion,
+    releaseStepCommand("sonatypeRelease"),
+    pushChanges
+  )
 )
 
 lazy val updateVersionInReadme =

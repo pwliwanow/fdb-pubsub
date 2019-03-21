@@ -1,4 +1,5 @@
 .idea/
+.java-version
 target/
 *.log
 .DS_Store

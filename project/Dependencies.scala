@@ -3,26 +3,26 @@ import sbt._
 object Dependencies {
   private val testScopes = List(IntegrationTest, Test)
 
-  private val akkaVersion = "2.5.20"
+  val acyclicVersion = "0.1.8"
+  private lazy val acyclic = "com.lihaoyi" %% "acyclic" % acyclicVersion % "provided"
+
+  private val akkaVersion = "2.5.21"
   private lazy val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
   private lazy val akkaStreamsTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
 
-  private val fdb4sVersion = "0.7.0"
+  private val fdb4sVersion = "0.8.0"
   private lazy val fdb4sCore = "com.github.pwliwanow.foundationdb4s" %% "foundationdb4s-core" % fdb4sVersion
   private lazy val fdb4sAkkaStreams = "com.github.pwliwanow.foundationdb4s" %% "foundationdb4s-akka-streams" % fdb4sVersion
 
   private lazy val dependencies: Seq[ModuleID] =
-    Seq(fdb4sAkkaStreams, fdb4sCore)
+    Seq(acyclic, fdb4sAkkaStreams, fdb4sCore)
 
-  private val scalaTestVersion = "3.0.5"
+  private val scalaTestVersion = "3.0.7"
   private lazy val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion
-
-  private val scalaMockVersion = "4.1.0"
-  private lazy val scalaMock = "org.scalamock" %% "scalamock" % scalaMockVersion
 
   private lazy val testDeps: Seq[ModuleID] =
     for {
-      dep <- Seq(akkaTestKit, akkaStreamsTestKit, scalaTest, scalaMock)
+      dep <- Seq(akkaTestKit, akkaStreamsTestKit, scalaTest)
       testScope <- testScopes
     } yield dep % testScope
 
