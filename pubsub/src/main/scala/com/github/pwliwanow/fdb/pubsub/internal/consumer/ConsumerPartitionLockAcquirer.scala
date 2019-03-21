@@ -93,7 +93,10 @@ private[pubsub] class ConsumerPartitionLockAcquirer(
       case (locks, partitions) =>
         val activeLocks = locks.filter(!lockService.isExpired(_))
         val activeLocksForPartitions = activeLocks.iterator.map(_.key.partition)
-        val result = (0 until partitions).to[MutableSet]
+        val result = {
+          val set = MutableSet.empty[Int]
+          set ++= (0 until partitions)
+        }
         activeLocksForPartitions.foreach(result -= _)
         val locksToForceAcquire =
           calculateLocksToForceAcquire(activeLocks, result.size, partitions, consumerId)
