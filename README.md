@@ -32,10 +32,8 @@ Concepts and assumptions are similar to Kafka. Here is brief overview of FDB-Pub
 
 ### Current limitations
 - It's not yet production ready. If you'd like to use it in your project, please get it touch, I will be happy to help.
-- To stream data from a partition consumers acquire locks (those locks are later used to atomically commit offset; outdated locks fail to commit an offset and underyling partition stream is stopped). 
-Currently, those locks are being acquired rather aggressively by consumers that joined: consumer that held a lock is not aware about the fact that other consumer wants to join, and newly connected consumer simply acquires some of the locks that were held by others. 
-As the result, when processing data using at least once delivery semantics, it causes messages to be proccessed more times that it would be neccessary if locks were acquired gracefully. 
-It will be addressed in future releases.
+- To stream data from a partition consumers acquire locks (those locks are later used to atomically commit offset; outdated locks fail to commit an offset and underlying partition stream is stopped). Currently, those locks are being acquired rather aggressively by consumers that joined: consumer that held a lock is not aware about the fact that other consumer wants to join, and newly connected consumer simply acquires some of the locks that were held by others. 
+As the result, when processing data using at least once delivery semantics, it causes messages to be processed more times that it would be necessary if locks were acquired gracefully. It will be addressed in future releases.
 - No performance tests were performed as of now. Currently - with default settings - having up to 10 consumers and 1000 partitions per topic should be perfectly fine.
 
 # Quickstart
