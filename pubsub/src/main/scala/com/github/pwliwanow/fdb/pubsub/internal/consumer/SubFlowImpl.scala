@@ -5,7 +5,7 @@ import akka.stream.scaladsl.{Flow, Sink, SubFlow}
 /** Implementation taken mostly from Akka, where it's a part of an internal API.
   * Turns out, that implementation is also suitable here.
   */
-private[pubsub] class SubFlowImpl[In, Out, Mat, F[+ _], C, UMat](
+private[pubsub] class SubFlowImpl[In, Out, Mat, F[+_], C, UMat](
     val subFlow: Flow[In, Out, UMat],
     mergeBackFunction: MergeBack[In, F, UMat],
     finishFunction: Sink[In, UMat] => C)
@@ -43,6 +43,6 @@ private[pubsub] class SubFlowImpl[In, Out, Mat, F[+ _], C, UMat](
   }
 }
 
-private[pubsub] trait MergeBack[In, F[+ _], UMat] {
+private[pubsub] trait MergeBack[In, F[+_], UMat] {
   def apply[T](f: Flow[In, T, UMat], breadth: Int): F[T]
 }

@@ -42,7 +42,7 @@ private[pubsub] class ConsumerService(
             KeySelector.firstGreaterOrEqual(startRange.begin),
             KeySelector.firstGreaterOrEqual(wholeRange.end))
         }
-    Source.fromFutureSource(futureSource)
+    Source.futureSource(futureSource)
   }
 
   def createCommitAction(

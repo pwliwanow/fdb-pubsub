@@ -1,6 +1,5 @@
 package com.github.pwliwanow.fdb.pubsub.example
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Sink
 import com.apple.foundationdb.subspace.Subspace
 import com.apple.foundationdb.tuple.Tuple
@@ -22,7 +21,7 @@ object ExampleScala {
   val showConsumedElements = false
 
   def main(args: Array[String]): Unit = {
-    val system: ActorSystem = ActorSystem()
+    implicit val system: ActorSystem = ActorSystem()
     implicit def ec: ExecutionContextExecutor = system.dispatcher
     val database: Database = FDB.selectAPIVersion(600).open(null, ec)
 
@@ -34,7 +33,7 @@ object ExampleScala {
 
     produceElements(pubSubClient.producer, database)
 
-    consumeElements(pubSubClient, database, system)
+    consumeElements(pubSubClient, database)
 
     system.terminate().onComplete { _ =>
       database.close()
@@ -63,9 +62,9 @@ object ExampleScala {
     println(s"Producing $numberOfElementsToProduce elements took $producingElementsTimeMs ms.")
   }
 
-  def consumeElements(pubSubClient: PubSubClient, database: Database, system: ActorSystem)(
-      implicit ec: ExecutionContextExecutor): Unit = {
-    implicit val mat = ActorMaterializer()(system)
+  def consumeElements(pubSubClient: PubSubClient, database: Database)(
+      implicit ec: ExecutionContextExecutor,
+      system: ActorSystem): Unit = {
     val consumer = pubSubClient.consumer(topic, consumerGroup, ConsumerSettings())
     val (consumedElements, consumingElementsTimeMs) = measure {
       consumer

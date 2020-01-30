@@ -6,9 +6,9 @@ import akka.NotUsed
 import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, RunnableGraph, Sink, Source, SubFlow}
 import com.apple.foundationdb.subspace.Subspace
-import com.apple.foundationdb.tuple.Tuple
+import com.apple.foundationdb.tuple.{Tuple, Versionstamp}
 import com.apple.foundationdb.{Database, KeyValue}
-import com.github.pwliwanow.fdb.pubsub.internal.common.{TopicMetadataSubspace, TopicSubspace}
+import com.github.pwliwanow.fdb.pubsub.internal.common.{SerDe, TopicMetadataSubspace, TopicSubspace}
 import com.github.pwliwanow.fdb.pubsub.internal.consumer._
 import com.github.pwliwanow.fdb.pubsub.internal.locking.{ConsumerLockService, ConsumersLockSubspace}
 import com.github.pwliwanow.fdb.pubsub.internal.metadata.{
@@ -17,6 +17,7 @@ import com.github.pwliwanow.fdb.pubsub.internal.metadata.{
   TopicMetadataService
 }
 import com.github.pwliwanow.fdb.pubsub.{ConsumerRecord, ConsumerSettings}
+import com.github.pwliwanow.foundationdb4s.core.{DBIO, ReadDBIO}
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
 
@@ -63,6 +64,7 @@ object PubSubClient {
     new FdbPubSubClient(
       clock,
       typedTopicSubspace,
+      consumerGroupMetadataService,
       metadataService,
       consumerService,
       typedLockSubspace,
@@ -76,15 +78,33 @@ trait PubSubClient {
     * this will fail with [[com.github.pwliwanow.fdb.pubsub.error.TopicAlreadyExistsException]].
     */
   def createTopic(topic: String, numberOfPartitions: Int)(
-      implicit ec: ExecutionContextExecutor): Future[NotUsed]
+      implicit ec: ExecutionContextExecutor): Future[Unit]
+
   def consumer(topic: String, consumerGroup: String, settings: ConsumerSettings)(
       implicit mat: Materializer): PubSubClient.ConsumerSubSource
+
+  /** Clears partition for topic up to provided [[Versionstamp]].
+    *
+    * Use with caution, as it cannot be reverted and data will be deleted.
+    */
+  def clear(topic: String, partitionNumber: Int, untilOffset: Versionstamp): DBIO[Unit]
+
+  /** Returns latest committed offset for the given topic, consumer group and partition number */
+  def getOffset(
+      topic: String,
+      consumerGroup: String,
+      partitionNumber: Int): ReadDBIO[Option[Versionstamp]]
+
+  /** Returns partition indices that exist for this topic. */
+  def getPartitions(topic: String): ReadDBIO[List[Int]]
+
   def producer: Producer
 }
 
 private[pubsub] class FdbPubSubClient(
     private val clock: Clock,
     private val topicSubspace: TopicSubspace,
+    private val consumerGroupMetadataService: ConsumerGroupMetadataService,
     private val topicMetadataService: TopicMetadataService,
     private val consumerService: ConsumerService,
     private val lockSubspace: ConsumersLockSubspace,
@@ -96,7 +116,7 @@ private[pubsub] class FdbPubSubClient(
   }
 
   override def createTopic(topic: String, numberOfPartitions: Int)(
-      implicit ec: ExecutionContextExecutor): Future[NotUsed] = {
+      implicit ec: ExecutionContextExecutor): Future[Unit] = {
     topicMetadataService.createTopic(topic, numberOfPartitions).transact(database)
   }
 
@@ -128,5 +148,23 @@ private[pubsub] class FdbPubSubClient(
         ()
       })
     new SubFlowImpl(Flow[ConsumerRecord[KeyValue]], merge, finish)
+  }
+
+  override def clear(topic: String, partitionNumber: Int, upTo: Versionstamp): DBIO[Unit] = {
+    // topic, partition, versionstamp
+    val startRange = topicSubspace.range(Tuple.from(topic, SerDe.encodeInt(partitionNumber)))
+    val endRange = topicSubspace.range(Tuple.from(topic, SerDe.encodeInt(partitionNumber), upTo))
+    val range = new com.apple.foundationdb.Range(startRange.begin, endRange.begin)
+    topicSubspace.clear(range)
+  }
+
+  override def getOffset(topic: String, consumerGroup: String, partitionNumber: Int) = {
+    consumerGroupMetadataService.getOffset(topic, consumerGroup, partitionNumber)
+  }
+
+  override def getPartitions(topic: String): ReadDBIO[List[Int]] = {
+    topicMetadataService
+      .getNumberOfPartitions(topic)
+      .map(_.fold(List.empty[Int])(n => (0 until n).toList))
   }
 }

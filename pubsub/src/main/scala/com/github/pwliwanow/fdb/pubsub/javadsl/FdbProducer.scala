@@ -12,7 +12,7 @@ protected class FdbProducer(underlying: ScalaProducer) extends Producer {
       topic: String,
       key: Array[Byte],
       value: Array[Byte]): CompletableFuture[NotUsed] = {
-    underlying.send(topic, key, value).transactJava(tx)
+    underlying.send(topic, key, value).transactJava(tx).thenApply(_ => NotUsed)
   }
 
   override def send(
@@ -21,7 +21,7 @@ protected class FdbProducer(underlying: ScalaProducer) extends Producer {
       key: Array[Byte],
       value: Array[Byte],
       userVersion: Int): CompletableFuture[NotUsed] = {
-    underlying.send(topic, key, value, userVersion).transactJava(tx)
+    underlying.send(topic, key, value, userVersion).transactJava(tx).thenApply(_ => NotUsed)
   }
 
   override def send(
@@ -30,7 +30,7 @@ protected class FdbProducer(underlying: ScalaProducer) extends Producer {
       partitionNumber: Int,
       key: Array[Byte],
       value: Array[Byte]): CompletableFuture[NotUsed] = {
-    underlying.send(topic, partitionNumber, key, value).transactJava(tx)
+    underlying.send(topic, partitionNumber, key, value).transactJava(tx).thenApply(_ => NotUsed)
   }
 
   override def send(
@@ -40,6 +40,9 @@ protected class FdbProducer(underlying: ScalaProducer) extends Producer {
       key: Array[Byte],
       value: Array[Byte],
       userVersion: Int): CompletableFuture[NotUsed] = {
-    underlying.send(topic, partitionNumber, key, value, userVersion).transactJava(tx)
+    underlying
+      .send(topic, partitionNumber, key, value, userVersion)
+      .transactJava(tx)
+      .thenApply(_ => NotUsed)
   }
 }

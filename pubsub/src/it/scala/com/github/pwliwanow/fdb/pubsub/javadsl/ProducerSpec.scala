@@ -88,7 +88,7 @@ class ProducerSpec extends FdbPubSubSpec {
           Tuple.from(keys.head).pack,
           Tuple.from(values.head).pack,
           2)
-    }
+      }
     val exception = intercept[CompletionException](produce().join())
     assert(exception.getCause.isInstanceOf[PartitionNotExistsException])
   }

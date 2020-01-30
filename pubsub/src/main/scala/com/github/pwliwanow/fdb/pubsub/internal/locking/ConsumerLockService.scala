@@ -67,7 +67,7 @@ private[pubsub] class ConsumerLockService(
     val dbio: DBIO[Boolean] = for {
       maybeLock <- lockSubspace.get(key).toDBIO
       shouldBeRefreshed = maybeLock.fold(false)(_.acquiredWith == acquiredWith)
-      _ <- if (shouldBeRefreshed) doRefresh() else DBIO.pure(Unit)
+      _ <- if (shouldBeRefreshed) doRefresh() else DBIO.unit
     } yield shouldBeRefreshed
     dbio.transact(database).map { refreshed =>
       if (refreshed) Some(ConsumerLock(key, acquiredWith, now, acquiredBy))
@@ -97,7 +97,7 @@ private[pubsub] class ConsumerLockService(
     for {
       maybeCurrentLock <- lockSubspace.get(lock.key).toDBIO
       shouldBeReleased = maybeCurrentLock.fold(false)(_.acquiredWith == lock.acquiredWith)
-      _ <- if (shouldBeReleased) lockSubspace.clear(lock.key) else DBIO.pure(Unit)
+      _ <- if (shouldBeReleased) lockSubspace.clear(lock.key) else DBIO.unit
     } yield ()
   }
 

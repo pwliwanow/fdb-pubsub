@@ -36,6 +36,9 @@ Concepts and assumptions are similar to Kafka. Here is brief overview of FDB-Pub
 As the result, when processing data using at least once delivery semantics, it causes messages to be processed more times that it would be necessary if locks were acquired gracefully. It will be addressed in future releases.
 - No performance tests were performed as of now. Currently - with default settings - having up to 10 consumers and 1000 partitions per topic should be perfectly fine.
 
+### Disclaimer
+It's not well-tested on production. I'd recommend using Kafka or Pulsar instead. 
+
 # Quickstart
 FDB-PubSub provides both Java and Scala API. Java API is present in package `com.github.pwliwanow.fdb.pubsub.javadsl` and Scala API is present in `com.github.pwliwanow.fdb.pubsub.scaladsl`. Module `example` contains small examples written in Java and in Scala.
 
@@ -222,4 +225,39 @@ consumer
 CompletionStage<Void> sendNotCriticalNotification(ConsumerRecord<Entity> record) {
   // implementation here
 }
+```
+
+### Cleaning data from topics
+To enable cleaning data from topics three basic methods are provided: `clear`, `getOffset` and `getPartitions`.
+Those methods can be combined as follows:
+```scala
+// Scala
+import cats.implicits._
+val topic = "products"
+val consumerGroups = List("cg1", "cg2")
+val dbio = for {
+  partitions <- pubSubClient.getPartitions(topic).toDBIO
+  consumerGroupPartitions = partitions.flatMap(p => consumerGroups.map(c => (p, c)))
+  _ <- consumerGroupPartitions.parTraverse { case (p, c) =>
+    pubSubClient
+      .getOffset(topic, c, p)
+      .toDBIO
+      .flatMap(_.fold(DBIO.unit)(offset => pubSubClient.clear(topic, p, offset)))
+  }
+} yield ()
+dbio.transact(database)
+```
+```java
+// Java, for simplicity example below is blocking
+String topic = "products";
+List<String> consumerGroups = Arrays.asList("cg1", "cg2");
+db.run((Transaction tr) -> {
+    List<Int> partitions = pubSubClient.getPartitions(tr, topic).join();
+    for (String c: consumerGroups)
+        for (int p: partitions) {
+            pubSubClient.getOffset(tr, topic, p, c).join().ifPresent(offset -> {
+                pubSubClient.clear(tr, topic, p, offset).join();
+            });
+        }
+});
 ```
