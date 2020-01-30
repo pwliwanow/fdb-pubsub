@@ -4,7 +4,7 @@ import java.time.Instant
 import java.util.UUID
 
 import akka.NotUsed
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import akka.stream.scaladsl.{Flow, Keep, MergeHub, Sink}
 import com.apple.foundationdb.KeyValue
 import com.apple.foundationdb.tuple.{Tuple, Versionstamp}
@@ -328,7 +328,7 @@ class ConsumerSpec extends FdbPubSubSpec {
   private def runConsumerAndCollectData(
       numberOfElements: Int,
       flow: Flow[ConsumerRecord[KeyValue], ConsumerRecord[KeyValue], NotUsed])(
-      implicit mat: ActorMaterializer): List[ConsumerRecord[KeyValue]] = {
+      implicit mat: Materializer): List[ConsumerRecord[KeyValue]] = {
     createConsumer()
       .via(flow)
       .mergeSubstreams
@@ -338,7 +338,7 @@ class ConsumerSpec extends FdbPubSubSpec {
       .toList
   }
 
-  private def createConsumer()(implicit mat: ActorMaterializer): PubSubClient.ConsumerSubSource = {
+  private def createConsumer()(implicit mat: Materializer): PubSubClient.ConsumerSubSource = {
     pubSubClient.consumer(topic, consumerGroup, ConsumerSettings())
   }
 

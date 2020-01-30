@@ -3,7 +3,6 @@ package com.github.pwliwanow.fdb.pubsub.scaladsl
 import java.time.Instant
 import java.util
 
-import akka.NotUsed
 import com.apple.foundationdb.KeyValue
 import com.apple.foundationdb.tuple.Versionstamp
 import com.github.pwliwanow.fdb.pubsub.error.{PartitionNotExistsException, TopicNotExistsException}
@@ -17,13 +16,13 @@ trait Producer {
     * [[com.github.pwliwanow.fdb.pubsub.error.TopicNotExistsException]]
     * if given topic does not exists.
     */
-  def send(topic: String, key: Array[Byte], value: Array[Byte]): DBIO[NotUsed]
+  def send(topic: String, key: Array[Byte], value: Array[Byte]): DBIO[Unit]
 
   /** It will result in failed [[DBIO]] with
     * [[com.github.pwliwanow.fdb.pubsub.error.TopicNotExistsException]]
     * if given topic does not exists.
     */
-  def send(topic: String, key: Array[Byte], value: Array[Byte], userVersion: Int): DBIO[NotUsed]
+  def send(topic: String, key: Array[Byte], value: Array[Byte], userVersion: Int): DBIO[Unit]
 
   /** It will result in failed [[DBIO]] with:
     * - [[com.github.pwliwanow.fdb.pubsub.error.TopicNotExistsException]]
@@ -31,7 +30,7 @@ trait Producer {
     * - [[com.github.pwliwanow.fdb.pubsub.error.PartitionNotExistsException]]
     *   if specified partition does not exist.
     */
-  def send(topic: String, partitionNumber: Int, key: Array[Byte], value: Array[Byte]): DBIO[NotUsed]
+  def send(topic: String, partitionNumber: Int, key: Array[Byte], value: Array[Byte]): DBIO[Unit]
 
   /** It will result in failed [[DBIO]] with:
     * - [[com.github.pwliwanow.fdb.pubsub.error.TopicNotExistsException]]
@@ -44,7 +43,7 @@ trait Producer {
       partitionNumber: Int,
       key: Array[Byte],
       value: Array[Byte],
-      userVersion: Int): DBIO[NotUsed]
+      userVersion: Int): DBIO[Unit]
 }
 
 private[pubsub] final class FdbProducer(
@@ -52,23 +51,23 @@ private[pubsub] final class FdbProducer(
     metadataService: TopicMetadataService)
     extends Producer {
 
-  def send(topic: String, key: Array[Byte], value: Array[Byte]): DBIO[NotUsed] = {
+  def send(topic: String, key: Array[Byte], value: Array[Byte]): DBIO[Unit] = {
     send(topic, key, value, userVersion = 0)
   }
 
-  def send(topic: String, key: Array[Byte], value: Array[Byte], userVersion: Int): DBIO[NotUsed] = {
+  def send(topic: String, key: Array[Byte], value: Array[Byte], userVersion: Int): DBIO[Unit] = {
     for {
       numberOfPartitions <- getNumberOfPartitions(topic).toDBIO
       partitionNumber = Math.abs(util.Arrays.hashCode(key) % numberOfPartitions)
       _ <- store(topic, partitionNumber, key, value, userVersion)
-    } yield NotUsed
+    } yield ()
   }
 
   def send(
       topic: String,
       partitionNumber: Int,
       key: Array[Byte],
-      value: Array[Byte]): DBIO[NotUsed] = {
+      value: Array[Byte]): DBIO[Unit] = {
     send(topic, partitionNumber, key, value, userVersion = 0)
   }
 
@@ -77,7 +76,7 @@ private[pubsub] final class FdbProducer(
       partitionNumber: Int,
       key: Array[Byte],
       value: Array[Byte],
-      userVersion: Int): DBIO[NotUsed] = {
+      userVersion: Int): DBIO[Unit] = {
     for {
       numberOfPartitions <- getNumberOfPartitions(topic).toDBIO
       _ <- if (numberOfPartitions < partitionNumber) {
@@ -85,7 +84,7 @@ private[pubsub] final class FdbProducer(
       } else {
         store(topic, partitionNumber, key, value, userVersion)
       }
-    } yield NotUsed
+    } yield ()
   }
 
   private def store(

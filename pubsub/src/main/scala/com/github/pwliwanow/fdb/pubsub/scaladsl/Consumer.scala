@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContextExecutor
 object Consumer {
 
   def committableFlow[A](database: Database)(implicit ec: ExecutionContextExecutor)
-    : Flow[ConsumerRecord[A], ConsumerRecord[A], NotUsed] = {
+      : Flow[ConsumerRecord[A], ConsumerRecord[A], NotUsed] = {
     committableFlow[A, ConsumerRecord[A]](database, DBIO.pure)(ec)
   }
 

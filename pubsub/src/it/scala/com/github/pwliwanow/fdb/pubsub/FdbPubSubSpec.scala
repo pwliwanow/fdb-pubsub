@@ -4,7 +4,7 @@ import java.time.{Clock, ZoneOffset}
 import java.util
 
 import akka.actor.ActorSystem
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import akka.testkit.TestKit
 import com.apple.foundationdb.{Database, FDB, KeyValue}
 import com.apple.foundationdb.subspace.Subspace
@@ -20,7 +20,8 @@ import com.github.pwliwanow.fdb.pubsub.internal.metadata.{
   TopicMetadataService
 }
 import com.github.pwliwanow.fdb.pubsub.scaladsl.PubSubClient
-import org.scalatest.{BeforeAndAfterEach, FlatSpecLike}
+import org.scalatest.flatspec.AnyFlatSpecLike
+import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContextExecutor, Future}
@@ -28,10 +29,10 @@ import scala.util.Try
 
 abstract class FdbPubSubSpec
     extends TestKit(ActorSystem())
-    with FlatSpecLike
+    with AnyFlatSpecLike
     with BeforeAndAfterEach {
 
-  protected val database: Database = FDB.selectAPIVersion(600).open(null, system.dispatcher)
+  protected val database: Database = FDB.selectAPIVersion(620).open(null, system.dispatcher)
 
   implicit def ec: ExecutionContextExecutor = system.dispatcher
 
@@ -73,8 +74,8 @@ abstract class FdbPubSubSpec
     topicMetadataService.createTopic(topic, numberOfPartitions).transact(database).await
   }
 
-  def withMaterializer[A](f: ActorMaterializer => A): A = {
-    val mat = ActorMaterializer()
+  def withMaterializer[A](f: Materializer => A): A = {
+    val mat = Materializer.createMaterializer(system)
     val res = Try(f(mat))
     mat.shutdown()
     res.get

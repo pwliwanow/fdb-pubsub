@@ -50,7 +50,7 @@ private[pubsub] class PartitionSources(
       setHandler(out, this)
 
       override def preStart(): Unit = {
-        scheduledLockAcquiring = materializer.schedulePeriodically(
+        scheduledLockAcquiring = materializer.scheduleAtFixedRate(
           initialDelay = acquireLocksInitialDelay,
           interval = acquireLocksInterval,
           task = () => {
