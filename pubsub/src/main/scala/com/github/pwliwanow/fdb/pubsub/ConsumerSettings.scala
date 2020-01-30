@@ -6,9 +6,9 @@ object ConsumerSettings {
   def apply(): ConsumerSettings = {
     ConsumerSettings(
       acquireLocksInitialDelay = 0.millis,
-      acquireLocksInterval = 2.seconds,
-      partitionPollingInterval = 100.millis,
-      lockValidityDuration = 5.seconds)
+      acquireLocksInterval = 5.seconds,
+      partitionPollingInterval = 1.second,
+      lockValidityDuration = 12.seconds)
   }
 
   def create(): ConsumerSettings = apply()
