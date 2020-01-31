@@ -45,7 +45,7 @@ FDB-PubSub provides both Java and Scala API. Java API is present in package `com
 ### Dependency
 To get started with FDB-PubSub add the following dependency with SBT:
 ```scala
-val fdbPubSubVersion = "0.1.2"
+val fdbPubSubVersion = "0.2.0"
 libraryDependencies += "com.github.pwliwanow.fdb-pubsub" %% "pubsub" % fdbPubSubVersion
 ```
 or Maven:
@@ -53,7 +53,7 @@ or Maven:
 <dependency>
   <groupId>com.github.pwliwanow.fdb-pubsub</groupId>
   <artifactId>pubsub_2.12</artifactId>
-  <version>0.1.2</version>
+  <version>0.2.0</version>
 </dependency>
 ```
 
