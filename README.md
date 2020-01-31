@@ -65,7 +65,7 @@ import com.github.pwliwanow.fdb.pubsub.scaladsl.PubSubClient
 
 val system = ActorSystem()
 implicit ec = system.dispacher()
-val db = FDB.selectAPIVersion(600).open(null, ec)
+val db = FDB.selectAPIVersion(620).open(null, ec)
 val pubSubSubspace = new Subspace(Tuple.from("PubSubExample"))
 val pubSubClient = PubSubClient(pubSubSubspace, database)
 ```
