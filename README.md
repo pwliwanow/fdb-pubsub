@@ -25,7 +25,7 @@ Concepts and assumptions are similar to Kafka. Here is brief overview of FDB-Pub
 - User data consists of key (byte array) and value (byte array)
 - Values with the same key will end up in the same partition (unless user specified different partition explicitly)
 - Records are _ordered_ within the partition
-- Within topic each record has assigned unique _offset_. Offset is of type [Versionstamp](https://apple.github.io/foundationdb/javadoc/com/apple/foundationdb/tuple/Versionstamp.html)
+- Within topic each record has unique _offset_ assigned. Offset is of type [Versionstamp](https://apple.github.io/foundationdb/javadoc/com/apple/foundationdb/tuple/Versionstamp.html)
 - Each consumer belongs to a _consumer group_
 - Records within a partition will be processed in order
 - Records for consumers with the same consumer groups will be load balanced (e.g. given topic with 10 partitions if at first there is a single consumer `A` that process data from all partitions, and consumer `B` joins, consumer `B` will take over processing data from 5 partitions and consumer `A` will continue processing data from the other 5 partitions)
