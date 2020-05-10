@@ -17,7 +17,7 @@ object Dependencies {
   private lazy val dependencies: Seq[ModuleID] =
     Seq(acyclic, fdb4sAkkaStreams, fdb4sCore)
 
-  private val scalaTestVersion = "3.1.1"
+  private val scalaTestVersion = "3.1.2"
   private lazy val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion
 
   private lazy val testDeps: Seq[ModuleID] =
