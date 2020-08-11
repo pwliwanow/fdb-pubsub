@@ -1,0 +1,28 @@
+name: Test workflow
+# This workflow is triggered on pushes to the repository.
+on:
+  push:
+    branches:
+      - "feature/migrate_ci_to_github_actions"
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: shopstic/jdk11-sbt:1.3.12
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codecov/codecov-action@v1
+      - name: Install FDB
+        run: |
+          apt-get update && \
+            apt-get -qq -y install wget &&
+            apt-get -qq -y install python2.7  &&
+            apt-get -qq -y install python &&
+            wget --no-check-certificate https://www.foundationdb.org/downloads/6.2.22/ubuntu/installers/foundationdb-clients_6.2.22-1_amd64.deb &&
+            wget --no-check-certificate https://www.foundationdb.org/downloads/6.2.22/ubuntu/installers/foundationdb-server_6.2.22-1_amd64.deb &&
+            dpkg -i foundationdb-clients_6.2.22-1_amd64.deb foundationdb-server_6.2.22-1_amd64.deb
+      - name: Build
+        run: sbt test:scalafmt scalafmtSbt coverage +test coverageReport
