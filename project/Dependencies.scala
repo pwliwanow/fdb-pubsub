@@ -6,7 +6,7 @@ object Dependencies {
   val acyclicVersion = "0.2.0"
   private lazy val acyclic = "com.lihaoyi" %% "acyclic" % acyclicVersion % "provided"
 
-  private val akkaVersion = "2.6.6"
+  private val akkaVersion = "2.6.10"
   private lazy val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
   private lazy val akkaStreamsTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
 
