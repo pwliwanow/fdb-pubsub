@@ -3,7 +3,7 @@ import sbt._
 object Dependencies {
   private val testScopes = List(IntegrationTest, Test)
 
-  val acyclicVersion = "0.2.0"
+  val acyclicVersion = "0.2.1"
   private lazy val acyclic = "com.lihaoyi" %% "acyclic" % acyclicVersion % "provided"
 
   private val akkaVersion = "2.6.6"
