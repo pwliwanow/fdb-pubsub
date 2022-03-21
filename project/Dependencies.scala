@@ -6,13 +6,14 @@ object Dependencies {
   val acyclicVersion = "0.2.0"
   private lazy val acyclic = "com.lihaoyi" %% "acyclic" % acyclicVersion % "provided"
 
-  private val akkaVersion = "2.6.6"
+  private val akkaVersion = "2.6.19"
   private lazy val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % akkaVersion
   private lazy val akkaStreamsTestKit = "com.typesafe.akka" %% "akka-stream-testkit" % akkaVersion
 
   private val fdb4sVersion = "0.11.0"
   private lazy val fdb4sCore = "com.github.pwliwanow.foundationdb4s" %% "core" % fdb4sVersion
-  private lazy val fdb4sAkkaStreams = "com.github.pwliwanow.foundationdb4s" %% "akka-streams" % fdb4sVersion
+  private lazy val fdb4sAkkaStreams =
+    "com.github.pwliwanow.foundationdb4s" %% "akka-streams" % fdb4sVersion
 
   private lazy val dependencies: Seq[ModuleID] =
     Seq(acyclic, fdb4sAkkaStreams, fdb4sCore)
