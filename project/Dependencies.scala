@@ -12,12 +12,13 @@ object Dependencies {
 
   private val fdb4sVersion = "0.11.0"
   private lazy val fdb4sCore = "com.github.pwliwanow.foundationdb4s" %% "core" % fdb4sVersion
-  private lazy val fdb4sAkkaStreams = "com.github.pwliwanow.foundationdb4s" %% "akka-streams" % fdb4sVersion
+  private lazy val fdb4sAkkaStreams =
+    "com.github.pwliwanow.foundationdb4s" %% "akka-streams" % fdb4sVersion
 
   private lazy val dependencies: Seq[ModuleID] =
     Seq(acyclic, fdb4sAkkaStreams, fdb4sCore)
 
-  private val scalaTestVersion = "3.2.0"
+  private val scalaTestVersion = "3.2.13"
   private lazy val scalaTest = "org.scalatest" %% "scalatest" % scalaTestVersion
 
   private lazy val testDeps: Seq[ModuleID] =
