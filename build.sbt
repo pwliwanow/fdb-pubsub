@@ -14,7 +14,7 @@ lazy val fdbPubSub = project
   .in(file("."))
   .settings(
     commonSettings,
-    skip in publish := true,
+    (publish / skip) := true,
     crossScalaVersions := Nil
   )
   .aggregate(pubSub, example)
@@ -35,7 +35,7 @@ lazy val example = project
   .settings(
     commonSettings,
     name := "example",
-    skip in publish := true,
+    (publish / skip) := true,
     coverageEnabled := false,
     crossScalaVersions := supportedScalaVersions
   )
@@ -48,7 +48,7 @@ lazy val commonSettings =
       scalafmtOnCompile := true,
       autoCompilerPlugins := true,
       addCompilerPlugin("com.lihaoyi" %% "acyclic" % acyclicVersion),
-      parallelExecution in ThisBuild := false,
+      (ThisBuild / parallelExecution) := false,
       fork := true,
       scalacOptions ++= {
         val commonScalacOptions =
@@ -78,7 +78,7 @@ lazy val commonSettings =
           else List.empty
         commonScalacOptions ++ extraOptions
       },
-      scalacOptions in (Compile, doc) ++= Seq(
+      (Compile / doc / scalacOptions) ++= Seq(
         "-no-link-warnings"
       )
     )
@@ -90,7 +90,7 @@ lazy val ossPublishSettings = Seq(
     else
       Opts.resolver.sonatypeStaging
   ),
-  publishArtifact in Test := false,
+  (Test / publishArtifact) := false,
   publishMavenStyle := true,
   sonatypeProfileName := "com.github.pwliwanow",
   pomIncludeRepository := { _ =>
