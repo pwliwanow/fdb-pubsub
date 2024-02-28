@@ -4,7 +4,7 @@ import sbtrelease.ReleasePlugin.autoImport._
 
 addCommandAlias("testAll", ";test;it:test")
 
-lazy val scala2_12 = "2.12.10"
+lazy val scala2_12 = "2.12.19"
 lazy val scala2_13 = "2.13.1"
 lazy val supportedScalaVersions = List(scala2_12, scala2_13)
 
